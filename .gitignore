@@ -1,0 +1,30 @@
+# Dependencies - never commit these
+node_modules/
+backend/node_modules/
+
+# Database - each user gets their own
+backend/prisma/studyos.db
+backend/prisma/*.db-journal
+backend/prisma/dev.db
+
+# Environment - contains secrets
+backend/.env
+
+# Logs
+*.log
+studyos.log
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+*.lnk
+
+# Electron build output
+dist/
+release/
+out/
+
+# Editor
+.vscode/
+.idea/

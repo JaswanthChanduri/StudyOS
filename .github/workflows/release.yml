@@ -1,0 +1,81 @@
+name: Build & Release StudyOS
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  # ── Job 1: Build Windows .exe installer ─────────────────────
+  build-exe:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          npm install
+          npx prisma generate
+
+      - name: Install Electron dependencies
+        run: npm install
+
+      - name: Build Windows installer
+        run: npm run build
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload .exe to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.exe
+          body: |
+            ## 📚 StudyOS ${{ github.ref_name }}
+
+            ### Option A — Windows App (Recommended — No Node.js needed)
+            1. Download `StudyOS-Setup-${{ github.ref_name }}.exe` below
+            2. Double-click to install
+            3. Open from Desktop shortcut or Start Menu
+            4. Done ✅
+
+            ### Option B — Run from source (Node.js required)
+            1. Install [Node.js LTS](https://nodejs.org)
+            2. Download the Source Code zip below
+            3. Extract → double-click `StudyOS.vbs`
+            4. Browser opens automatically ✅
+
+            ---
+            **Features:** Daily Planner · Streak Tracking · 10 Roadmaps · AI Advisor (Gemini/Claude/ChatGPT) · Custom Alarms · Notes & Reminders
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ── Job 2: Also publish source zip (for Node.js users) ──────
+  build-zip:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create source zip
+        run: |
+          zip -r StudyOS-Source-${{ github.ref_name }}.zip . \
+            --exclude "*.git*" \
+            --exclude "backend/node_modules/*" \
+            --exclude "backend/*.db" \
+            --exclude "node_modules/*" \
+            --exclude "dist/*" \
+            --exclude "*.log"
+
+      - name: Upload source zip to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: StudyOS-Source-*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
