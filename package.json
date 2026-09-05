@@ -1,0 +1,50 @@
+{
+  "name": "studyos",
+  "version": "2.0.0",
+  "description": "StudyOS — Personal Learning & Productivity OS",
+  "main": "electron/main.js",
+  "author": "StudyOS",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win --x64",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux"
+  },
+  "build": {
+    "appId": "com.studyos.app",
+    "productName": "StudyOS",
+    "copyright": "MIT",
+    "directories": { "output": "dist" },
+    "win": {
+      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "artifactName": "StudyOS-Setup-${version}.exe"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "StudyOS",
+      "installerHeaderImage": "",
+      "deleteAppDataOnUninstall": false
+    },
+    "files": [
+      "electron/**/*",
+      "frontend-desktop/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "backend",
+        "to": "backend",
+        "filter": ["**/*", "!node_modules/.cache/**", "!*.db"]
+      }
+    ],
+    "asar": true,
+    "asarUnpack": ["**/node_modules/@prisma/**", "**/node_modules/prisma/**"]
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3"
+  }
+}
